@@ -1,2 +1,2 @@
 # Sudoku
-Sudoku game by developer
+Sudoku game by Flutter
