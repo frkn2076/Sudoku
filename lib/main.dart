@@ -53,38 +53,110 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    double widthOfDevice = MediaQuery.of(context).size.width;
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
+
+    Widget createTable() {
+      return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
         ),
-        body: Table(
-          border: TableBorder.all(color: Colors.black),
+        height: widthOfDevice / 3 - 1,
+        width: widthOfDevice / 3 - 1,
+        child: Table(
+          border: TableBorder.symmetric(
+              inside: BorderSide(color: Colors.black54),
+              outside: BorderSide(color: Colors.black)),
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: List.generate(
-              9,
+              3,
               (row) => TableRow(
                   children: List.generate(
-                      9,
+                      3,
                       (column) => Padding(
                           padding: const EdgeInsets.all(5),
                           child: SizedBox(
                               width: 30,
                               height: 30,
                               child: TextField(
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                 ),
                               )))))),
+        ),
+      );
+    }
+
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Container(
+          padding: const EdgeInsets.all(9),
+          child: Table(
+              border: TableBorder.symmetric(
+                  outside: BorderSide(color: Colors.black)),
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                TableRow(children: [
+                  Container(
+                    height: widthOfDevice - 9,
+                    child: Container(
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 3, // takes 30% of available width
+                            child: Row(
+                              children: <Widget>[
+                                createTable(),
+                                createTable(),
+                                createTable()
+                              ],
+                            ),
+                          ),
+                          // Container(
+                          //   width: 100,
+                          //   child: Row(
+                          //     children: <Widget>[
+                          //       createTable(),
+                          //       createTable(),
+                          //       createTable(),
+                          //     ],
+                          //   ),
+                          // ),
+                          // Container(
+                          //   child: Row(
+                          //     children: <Widget>[
+                          //       createTable(),
+                          //       createTable(),
+                          //       createTable(),
+                          //     ],
+                          //   ),
+                          // ),
+                          // Container(
+                          //   child: Row(
+                          //     children: <Widget>[
+                          //       createTable(),
+                          //       createTable(),
+                          //       createTable(),
+                          //     ],
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ])
+              ]),
         ));
   }
 }
