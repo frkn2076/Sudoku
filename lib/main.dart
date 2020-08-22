@@ -59,14 +59,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   createTable(widthOfDevice / 9)
                 ],
               ),
-              // SizedBox(
-              //   height: 70,
-              // ),
-              // Container(
-              //   child: IconButton(
-              //     icon: ,
-              //   ),
-              // )
+              SizedBox(
+                height: 70,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey)
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.done_outline, color: Colors.green,),
+                  iconSize: 50, onPressed: () {  },
+                ),
+              )
             ],
           ),
         ));
@@ -93,17 +97,17 @@ Widget createTable(double cellHeight) {
                   (column) => InkResponse(
                     child: SizedBox(
                       height: cellHeight,
-                      child: TextField(
+                      child: TextFormField(
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(1)
-                        ], // Only numbers can be entered
+                        ],
                         style: TextStyle(
                           fontSize: 20,
                         ),
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
-                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.only(bottom: cellHeight/4)
                         ),
                       ),
                     ),
