@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -30,10 +30,9 @@ class _MyHomePageState extends State<MyHomePage> {
   List<List<List<int>>> squares;
   List<List<List<int>>> editedSudoku;
 
-  //Only initializing
   @override
   void initState() {
-    squares = fillSquares();
+    squares = Sudoku.fillSquares();
     editedSudoku = squares;
     super.initState();
   }
@@ -92,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: IconButton(
                       icon: Icon(
                         Icons.refresh,
-                        color: Colors.green,
+                        color: Colors.blueGrey,
                       ),
                       iconSize: 50,
                       onPressed: () {
@@ -101,12 +100,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text('REFRESH!'),
-                              content: const Text("REFRESH"),
+                              content: const Text("Sudoku is refreshed!"),
                               actions: <Widget>[
                                 FlatButton(
                                   child: Text('Ok'),
                                   onPressed: () {
-                                    Navigator.of(context).pop();
+                                    Navigator.pushReplacement(context,
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) {
+                                      return MyApp();
+                                    }));
                                   },
                                 ),
                               ],
@@ -123,27 +126,45 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: IconButton(
                       icon: Icon(
                         Icons.done_outline,
-                        color: Colors.green,
+                        color: Colors.blueGrey,
                       ),
                       iconSize: 50,
                       onPressed: () {
-                        return showDialog<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Oppps!'),
-                              content: const Text("Not a valid sudoku"),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text('Ok'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        return Sudoku.isValidSudoku(editedSudoku)
+                            ? showDialog<void>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Heyyy!'),
+                                    content: const Text("You completed sudoku"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        child: Text('Ok'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              )
+                            : showDialog<void>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Oppps!'),
+                                    content: const Text("Not a valid sudoku"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        child: Text('Ok'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                       },
                     ),
                   ),
@@ -175,13 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           height: cellHeight,
                           child: TextField(
                             onChanged: (String item) {
-                              // ignore: unused_element
-                              // setState(){
                               this.editedSudoku[squareId][list.indexOf(value)]
                                   [index] = int.parse(item);
                               print(editedSudoku[squareId]);
-                              // }
-                              // editedSudoku[squareId%3+(squareId/3).floor()+list.indexOf(value)][squareId%3*3+index] = int.parse(item);
                               print(
                                   "item: $item  index1: $index   index2: ${list.indexOf(value)}   squareId: $squareId");
                             },
@@ -214,8 +231,46 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
 
-  List<List<List<int>>> fillSquares() {
+class Sudoku {
+  static bool isValidSudoku(List<List<List<int>>> squares) {
+    Function eq = const ListEquality().equals;
+    List<int> expectedSorted = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    List<List<int>> sudoku = List<List<int>>();
+
+    //square check
+    for (var i = 0; i < 9; i++) {
+      List<int> oneDimensionalSquare =
+          squares[i][0] + squares[i][1] + squares[i][2];
+      oneDimensionalSquare.sort();
+      if (!eq(oneDimensionalSquare, expectedSorted)) {
+        return false;
+      }
+    }
+
+    //2d array convert
+    sudoku.add(squares[0][0] + squares[1][0] + squares[2][0]);
+    sudoku.add(squares[0][1] + squares[1][1] + squares[2][1]);
+    sudoku.add(squares[0][2] + squares[1][2] + squares[2][2]);
+    sudoku.add(squares[3][0] + squares[4][0] + squares[5][0]);
+    sudoku.add(squares[3][1] + squares[4][1] + squares[5][1]);
+    sudoku.add(squares[3][2] + squares[4][2] + squares[5][2]);
+    sudoku.add(squares[6][0] + squares[7][0] + squares[8][0]);
+    sudoku.add(squares[6][1] + squares[7][1] + squares[8][1]);
+    sudoku.add(squares[6][2] + squares[7][2] + squares[8][2]);
+
+    //sudoku check
+    for (var i = 0; i < 9; i++) {
+      sudoku[0].sort();
+      if (!eq(sudoku[0], expectedSorted)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static List<List<List<int>>> fillSquares() {
     List<List<List<int>>> squares = List<List<List<int>>>();
     squares.add(Sudoku.getInnerSquare(0, 0));
     squares.add(Sudoku.getInnerSquare(0, 1));
@@ -273,9 +328,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //   return availableOnes;
   // }
 
-}
-
-class Sudoku {
   static List<List<int>> getInnerSquare(int row, int column) {
     var sudoku = maskSudoku();
     var innerSquare = List<List<int>>();
