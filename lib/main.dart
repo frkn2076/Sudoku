@@ -8,54 +8,44 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final List<List<int>> square00 = Sudoku.getInnerSquare(0, 0);
-  final List<List<int>> square01 = Sudoku.getInnerSquare(0, 1);
-  final List<List<int>> square02 = Sudoku.getInnerSquare(0, 2);
-  final List<List<int>> square10 = Sudoku.getInnerSquare(1, 0);
-  final List<List<int>> square11 = Sudoku.getInnerSquare(1, 1);
-  final List<List<int>> square12 = Sudoku.getInnerSquare(1, 2);
-  final List<List<int>> square20 = Sudoku.getInnerSquare(2, 0);
-  final List<List<int>> square21 = Sudoku.getInnerSquare(2, 1);
-  final List<List<int>> square22 = Sudoku.getInnerSquare(2, 2);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(title: 'Sudoku', squares: [
-        square00,
-        square01,
-        square02,
-        square10,
-        square11,
-        square12,
-        square20,
-        square21,
-        square22
-      ]),
+      home: MyHomePage(title: 'Sudoku'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title, this.squares}) : super(key: key);
+  MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
-  final List<List<List<int>>> squares;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<List<List<int>>> squares;
+  List<List<List<int>>> editedSudoku;
+
+  //Only initializing
+  @override
+  void initState() {
+    squares = fillSquares();
+    editedSudoku = squares;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double widthOfDevice = MediaQuery.of(context).size.width;
-
     return Scaffold(
       resizeToAvoidBottomInset: false, //Added for bottom overflow warning.
       appBar: AppBar(
         title: Text(widget.title),
+        backgroundColor: Colors.grey,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -70,23 +60,23 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  createTable(widthOfDevice / 9, widget.squares[0]),
-                  createTable(widthOfDevice / 9, widget.squares[1]),
-                  createTable(widthOfDevice / 9, widget.squares[2])
+                  createTable(widthOfDevice / 9, squares[0], 0),
+                  createTable(widthOfDevice / 9, squares[1], 1),
+                  createTable(widthOfDevice / 9, squares[2], 2)
                 ],
               ),
               Row(
                 children: <Widget>[
-                  createTable(widthOfDevice / 9, widget.squares[3]),
-                  createTable(widthOfDevice / 9, widget.squares[4]),
-                  createTable(widthOfDevice / 9, widget.squares[5])
+                  createTable(widthOfDevice / 9, squares[3], 3),
+                  createTable(widthOfDevice / 9, squares[4], 4),
+                  createTable(widthOfDevice / 9, squares[5], 5)
                 ],
               ),
               Row(
                 children: <Widget>[
-                  createTable(widthOfDevice / 9, widget.squares[6]),
-                  createTable(widthOfDevice / 9, widget.squares[7]),
-                  createTable(widthOfDevice / 9, widget.squares[8])
+                  createTable(widthOfDevice / 9, squares[6], 6),
+                  createTable(widthOfDevice / 9, squares[7], 7),
+                  createTable(widthOfDevice / 9, squares[8], 8)
                 ],
               ),
               SizedBox(
@@ -105,7 +95,25 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Colors.green,
                       ),
                       iconSize: 50,
-                      onPressed: () {},
+                      onPressed: () {
+                        return showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('REFRESH!'),
+                              content: const Text("REFRESH"),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text('Ok'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                   Container(
@@ -118,7 +126,25 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Colors.green,
                       ),
                       iconSize: 50,
-                      onPressed: () {},
+                      onPressed: () {
+                        return showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Oppps!'),
+                              content: const Text("Not a valid sudoku"),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text('Ok'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -130,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget createTable(double cellHeight, List<List<int>> list) {
+  Widget createTable(double cellHeight, List<List<int>> list, int squareId) {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -147,9 +173,18 @@ class _MyHomePageState extends State<MyHomePage> {
                       (index) => InkResponse(
                         child: SizedBox(
                           height: cellHeight,
-                          child:
-                              // Text(value[index].toString())
-                              TextField(
+                          child: TextField(
+                            onChanged: (String item) {
+                              // ignore: unused_element
+                              // setState(){
+                              this.editedSudoku[squareId][list.indexOf(value)]
+                                  [index] = int.parse(item);
+                              print(editedSudoku[squareId]);
+                              // }
+                              // editedSudoku[squareId%3+(squareId/3).floor()+list.indexOf(value)][squareId%3*3+index] = int.parse(item);
+                              print(
+                                  "item: $item  index1: $index   index2: ${list.indexOf(value)}   squareId: $squareId");
+                            },
                             readOnly: value[index] != 0,
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -178,6 +213,20 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  List<List<List<int>>> fillSquares() {
+    List<List<List<int>>> squares = List<List<List<int>>>();
+    squares.add(Sudoku.getInnerSquare(0, 0));
+    squares.add(Sudoku.getInnerSquare(0, 1));
+    squares.add(Sudoku.getInnerSquare(0, 2));
+    squares.add(Sudoku.getInnerSquare(1, 0));
+    squares.add(Sudoku.getInnerSquare(1, 1));
+    squares.add(Sudoku.getInnerSquare(1, 2));
+    squares.add(Sudoku.getInnerSquare(2, 0));
+    squares.add(Sudoku.getInnerSquare(2, 1));
+    squares.add(Sudoku.getInnerSquare(2, 2));
+    return squares;
   }
 
   // List<List<int>> createSudoku() {
