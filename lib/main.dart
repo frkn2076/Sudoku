@@ -105,11 +105,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                 FlatButton(
                                   child: Text('Ok'),
                                   onPressed: () {
-                                    Navigator.pushReplacement(context,
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) {
-                                      return MyApp();
-                                    }));
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                          return MyApp();
+                                        },
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
@@ -141,7 +144,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                       FlatButton(
                                         child: Text('Ok'),
                                         onPressed: () {
-                                          Navigator.of(context).pop();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (BuildContext context) {
+                                                return MyApp();
+                                              },
+                                            ),
+                                          );
                                         },
                                       ),
                                     ],
